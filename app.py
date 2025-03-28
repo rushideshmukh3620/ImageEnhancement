@@ -40,7 +40,7 @@ uploaded_imgs = st.file_uploader("📤 Upload Images", type=["jpg", "jpeg", "png
 
 if uploaded_imgs:
     for idx, uploaded_img in enumerate(uploaded_imgs):
-        st.write(f"### Image {idx+1}")  # Image numbering
+        st.write(f"##### {uploaded_img.name}")  # Image numbering
 
         # Load Image
         image = Image.open(uploaded_img)
@@ -65,8 +65,8 @@ if uploaded_imgs:
 
         # Download Button for Compressed Image
         st.download_button(
-            label=f"📥 Download Enhanced Image {idx+1}",
+            label=f"📥 Download Enhanced {uploaded_img.name}",
             data=compressed_img_bytes.getvalue(),
-            file_name=f"enhanced_image_{idx+1}.jpg",
+            file_name=f"enhanced_{uploaded_img.name}.jpg",
             mime="image/jpeg"
         )

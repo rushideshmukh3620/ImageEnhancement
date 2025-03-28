@@ -19,18 +19,6 @@ def enhance_image(img):
 
     return img_denoise
 
-# Function to reduce image size (Compress to ~1MB)
-def compress_image(img, target_size_kb=1000):
-    quality = 95  # Start with high quality
-    while True:
-        img_bytes = io.BytesIO()
-        img.save(img_bytes, format="JPEG", quality=quality)
-        size_kb = len(img_bytes.getvalue()) // 1024  # Convert to KB
-        if size_kb <= target_size_kb or quality <= 10:
-            break
-        quality -= 5  # Reduce quality step by step
-    return img_bytes
-
 # Streamlit UI
 st.title("🖼️ Multi-Image Enhancement App")
 st.write("Upload one or more images to enhance and compare before & after results.")
@@ -39,8 +27,8 @@ st.write("Upload one or more images to enhance and compare before & after result
 uploaded_imgs = st.file_uploader("📤 Upload Images", type=["jpg", "jpeg", "png", "jfif", "bmp", "tiff", "webp"], accept_multiple_files=True)
 
 if uploaded_imgs:
-    for idx, uploaded_img in enumerate(uploaded_imgs):
-        st.write(f"##### {uploaded_img.name}")  # Image numbering
+    for uploaded_img in uploaded_imgs:
+        st.write(f"### {uploaded_img.name}")  # Display original filename
 
         # Load Image
         image = Image.open(uploaded_img)
@@ -51,22 +39,27 @@ if uploaded_imgs:
         # Convert Enhanced Image back to PIL format
         enhanced_pil = Image.fromarray(enhanced_image)
 
-        # Compress Image (~1MB)
-        compressed_img_bytes = compress_image(enhanced_pil)
+        # Ensure the image is in RGB mode before saving as JPEG
+        if enhanced_pil.mode != 'RGB':
+            enhanced_pil = enhanced_pil.convert('RGB')
+
+        # Convert Image to Bytes for Download
+        img_bytes = io.BytesIO()
+        enhanced_pil.save(img_bytes, format="JPEG")
 
         # Show Before → After Comparison
         col1, col2 = st.columns(2)
 
         with col1:
-            st.image(image, caption="Before", use_container_width=True)
+            st.image(image, caption="🟢 Before", use_container_width=True)
 
         with col2:
-            st.image(enhanced_image, caption="After", use_container_width=True)
+            st.image(enhanced_image, caption="🟡 After", use_container_width=True)
 
-        # Download Button for Compressed Image
+        # Download Button for Enhanced Image
         st.download_button(
             label=f"📥 Download Enhanced {uploaded_img.name}",
-            data=compressed_img_bytes.getvalue(),
-            file_name=f"enhanced_{uploaded_img.name}.jpg",
+            data=img_bytes.getvalue(),
+            file_name=f"enhanced_{uploaded_img.name}",
             mime="image/jpeg"
         )

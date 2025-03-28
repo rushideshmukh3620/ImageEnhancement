@@ -51,10 +51,10 @@ if uploaded_imgs:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.image(image, caption="🟢 Before", use_container_width=True)
+            st.image(image, caption="Before", use_container_width=True)
 
         with col2:
-            st.image(enhanced_image, caption="🟡 After", use_container_width=True)
+            st.image(enhanced_image, caption="After", use_container_width=True)
 
         # Download Button for Enhanced Image
         st.download_button(
